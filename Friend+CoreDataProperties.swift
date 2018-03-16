@@ -2,7 +2,7 @@
 //  Friend+CoreDataProperties.swift
 //  facebookMessanger
 //
-//  Created by magdy on 3/11/18.
+//  Created by magdy on 3/16/18.
 //  Copyright © 2018 magdy. All rights reserved.
 //
 
@@ -19,6 +19,7 @@ extension Friend {
     @NSManaged public var name: String?
     @NSManaged public var profileImage: String?
     @NSManaged public var messages: NSSet?
+    @NSManaged public var lastMessage: Message?
 
 }
 

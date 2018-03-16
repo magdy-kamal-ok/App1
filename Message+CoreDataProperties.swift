@@ -2,7 +2,7 @@
 //  Message+CoreDataProperties.swift
 //  facebookMessanger
 //
-//  Created by magdy on 3/11/18.
+//  Created by magdy on 3/16/18.
 //  Copyright © 2018 magdy. All rights reserved.
 //
 
@@ -17,8 +17,8 @@ extension Message {
     }
 
     @NSManaged public var date: NSDate?
-    @NSManaged public var text: String?
     @NSManaged public var isSender: Bool
+    @NSManaged public var text: String?
     @NSManaged public var friend: Friend?
 
 }
