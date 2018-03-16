@@ -8,7 +8,7 @@
 
 import UIKit
 import CoreData
-class ChatLogController : UICollectionViewController,UICollectionViewDelegateFlowLayout
+class ChatLogController : UICollectionViewController,UICollectionViewDelegateFlowLayout,NSFetchedResultsControllerDelegate
 {
     private var cellId = "cellId"
     var friend:Friend?{
@@ -56,7 +56,7 @@ class ChatLogController : UICollectionViewController,UICollectionViewDelegateFlo
 //            let insertiaonIndexPath = NSIndexPath(item: item, section: 0)
 //            collectionView?.insertItems(at: [insertiaonIndexPath as IndexPath])
 //            collectionView?.scrollToItem(at: insertiaonIndexPath as IndexPath, at: .bottom, animated: true)
-//            inputTextField.text = nil
+              inputTextField.text = nil
         
         }
         catch let err{
@@ -95,9 +95,35 @@ class ChatLogController : UICollectionViewController,UICollectionViewDelegateFlo
         let delegate = UIApplication.shared.delegate as? AppDelegate
         let context = delegate?.persistentContainer.viewContext
         let frc = NSFetchedResultsController(fetchRequest: fetchRequest, managedObjectContext: context!, sectionNameKeyPath: nil, cacheName: nil)
-        
+        frc.delegate = self
         return frc
     }()
+    var blockOperations = [BlockOperation]()
+    func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange anObject: Any, at indexPath: IndexPath?, for type: NSFetchedResultsChangeType, newIndexPath: IndexPath?) {
+        
+        if type == .insert
+        {
+            // this for is you simulate multi messages
+            blockOperations.append(BlockOperation(block: {
+                self.collectionView?.insertItems(at: [newIndexPath!])
+            }))
+            
+            //collectionView?.scrollToItem(at: newIndexPath!, at: .bottom, animated: true)
+        }
+    }
+    func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
+        
+        collectionView?.performBatchUpdates({
+            for operation in self.blockOperations
+            {
+                operation.start()
+            }
+        }, completion: {(completed) in
+            let lastItem = (self.fetchedResultsController.sections?[0].numberOfObjects)!-1
+            let indexPath = NSIndexPath(item: lastItem, section: 0)
+            self.collectionView?.scrollToItem(at: indexPath as IndexPath, at: .bottom, animated: true)
+        })
+    }
     override func viewDidLoad() {
         super.viewDidLoad()
         do{
@@ -141,6 +167,11 @@ class ChatLogController : UICollectionViewController,UICollectionViewDelegateFlo
                 self.view.layoutIfNeeded()
             }, completion: {(completed) in
                 if isKeyboardShowing{
+                    
+                    let lastItem = (self.fetchedResultsController.sections?[0].numberOfObjects)!-1
+                    let indexPath = NSIndexPath(item: lastItem, section: 0)
+                    self.collectionView?.scrollToItem(at: indexPath as IndexPath, at: .bottom, animated: true)
+   
                // let indexPath = NSIndexPath(item: (self.messages?.count)!-1, section: 0)
                // self.collectionView?.scrollToItem(at: indexPath as IndexPath, at: .bottom, animated: true)
                 }
